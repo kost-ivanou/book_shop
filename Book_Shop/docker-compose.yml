@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0.43
+    environment:
+      MYSQL_ROOT_PASSWORD: 697254
+      MYSQL_DATABASE: book_shop
+    ports:
+      - "3308:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+       condition: service_healthy
+    environment:
+      - ConnectionStrings__Default=server=db;port=3306;database=book_shop;user=root;password=697254;
+
+volumes:
+  db_data:
