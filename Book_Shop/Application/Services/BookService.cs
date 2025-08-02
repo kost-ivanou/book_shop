@@ -35,6 +35,7 @@ public class BookService : IBookService
     public async Task DeleteAsync(int id)
     {
         var book = await _repo.GetByIdAsync(id);
+        
         if (book != null)
         {
             await _repo.DeleteAsync(book);

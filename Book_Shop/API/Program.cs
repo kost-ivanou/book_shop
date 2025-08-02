@@ -1,3 +1,4 @@
+using API.Middlewares;
 using Application.Extensions;
 using Infrastructure.Database;
 using Infrastructure.Extension;
@@ -19,6 +20,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.MapControllers();
 
