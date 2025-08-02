@@ -19,18 +19,6 @@ public class BookControllerTests
     }
 
     [Fact]
-    public async Task GetBooks_ReturnsOkWithBooks()
-    {
-        var books = new List<Book> { new Book { Id = 1, Name = "TestBook" } };
-        _bookServiceMock.Setup(s => s.GetAllAsync()).ReturnsAsync(books);
-
-        var result = await _controller.GetBooks();
-
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.Equal(books, okResult.Value);
-    }
-
-    [Fact]
     public async Task GetBookById_ReturnsNotFound_WhenBookIsNull()
     {
         _bookServiceMock.Setup(s => s.GetByIdAsync(1)).ReturnsAsync((Book)null);

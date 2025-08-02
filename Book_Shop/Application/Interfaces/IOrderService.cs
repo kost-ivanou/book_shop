@@ -7,7 +7,7 @@ public interface IOrderService
 {
     Task<IEnumerable<Order>> GetAllAsync();
     Task<Order> GetByIdAsync(int id);
-    Task CreateAsync(OrderDto dto);
-    Task DeleteAsync(int id);
+    Task<int> CreateAsync(OrderDto dto);
+    Task<bool> DeleteAsync(int id);
     Task<IEnumerable<Order>> GetFilteredAsync(OrderFilterDto filter);
 }

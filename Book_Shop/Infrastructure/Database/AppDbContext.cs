@@ -9,11 +9,6 @@ public class AppDbContext: DbContext, IAppDbContext
     {
     }
 
-    /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseMySQL("Server=localhost;User ID=root;Password=697254;Database=book_shop;");
-    }*/
-
     public DbSet<Book> Books { get; set; }
     public DbSet<Order> Orders { get; set; }
 }

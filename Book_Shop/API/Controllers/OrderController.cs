@@ -18,10 +18,14 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetOrders() => Ok(await _orderService.GetAllAsync());
+    public async Task<ActionResult<List<OrderResponseDto>>> GetOrders()
+    {
+        var orders = await _orderService.GetAllAsync();
+        return Ok(orders);
+    }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetOrderById([FromRoute] int id)
+    public async Task<ActionResult<OrderResponseDto>> GetOrderById([FromRoute] int id)
     {
         var order = await _orderService.GetByIdAsync(id);
         if (order == null)
@@ -31,21 +35,25 @@ public class OrderController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateOrder([FromBody] OrderDto dto)
+    public async Task<ActionResult<int>> CreateOrder([FromBody] OrderDto dto)
     {
-        await _orderService.CreateAsync(dto);
-        return Ok();
+        int id = await _orderService.CreateAsync(dto);
+        return Ok(id);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteOrder([FromRoute] int id)
     {
-        await _orderService.DeleteAsync(id);
+        if(!await _orderService.DeleteAsync(id))
+        {
+            return NotFound();
+        }
+
         return Ok();
     }
 
-    [HttpPost("filter")]
-    public async Task<IActionResult> FilterOrders([FromBody] OrderFilterDto filter)
+    [HttpGet("filter")]
+    public async Task<ActionResult<List<OrderResponseDto>>> FilterOrders([FromQuery] OrderFilterDto filter)
     {
         var result = await _orderService.GetFilteredAsync(filter);
         return Ok(result);

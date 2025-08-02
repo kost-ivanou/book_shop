@@ -21,14 +21,16 @@ public class OrderService : IOrderService
 
     public async Task<Order> GetByIdAsync(int id) => await _orderRepo.GetByIdAsync(id);
 
-    public async Task CreateAsync(OrderDto dto)
+    public async Task<int> CreateAsync(OrderDto dto)
     {
         var books = new List<Book>();
         foreach (var bookId in dto.BookIds)
         {
             var book = await _bookRepo.GetByIdAsync(bookId);
             if (book != null)
+            {
                 books.Add(book);
+            }
         }
 
         var order = new Order
@@ -39,16 +41,22 @@ public class OrderService : IOrderService
 
         await _orderRepo.AddAsync(order);
         await _orderRepo.SaveAsync();
+
+        return order.Id;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
         var order = await _orderRepo.GetByIdAsync(id);
+
         if (order != null)
         {
             await _orderRepo.DeleteAsync(order);
             await _orderRepo.SaveAsync();
+            return true;
         }
+
+        return false;
     }
 
     public async Task<IEnumerable<Order>> GetFilteredAsync(OrderFilterDto filter)
@@ -56,10 +64,14 @@ public class OrderService : IOrderService
         var query = (await _orderRepo.GetAllAsync()).AsQueryable();
 
         if (filter.Id.HasValue)
+        {
             query = query.Where(o => o.Id == filter.Id.Value);
+        }
 
         if (filter.OrderDate.HasValue)
+        {
             query = query.Where(o => o.OrderDate.Date == filter.OrderDate.Value.Date);
+        }
 
         return query.ToList();
     }

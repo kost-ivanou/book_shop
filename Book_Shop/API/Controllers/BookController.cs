@@ -1,5 +1,6 @@
 ﻿using Application.DTO;
 using Application.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -16,10 +17,14 @@ public class BookController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetBooks() => Ok(await _bookService.GetAllAsync());
+    public async Task<ActionResult<List<BookResponseDto>>> GetBooks()
+    {
+        var books = await _bookService.GetAllAsync();
+        return Ok(books);
+    }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetBookById([FromRoute] int id)
+    public async Task<ActionResult<BookResponseDto>> GetBookById([FromRoute] int id)
     {
         var book = await _bookService.GetByIdAsync(id);
         if (book == null)
@@ -29,21 +34,24 @@ public class BookController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateBook([FromBody] BookDto dto)
+    public async Task<ActionResult<int>> CreateBook([FromBody] BookDto dto)
     {
-        await _bookService.CreateAsync(dto);
-        return Ok();
+        int id = await _bookService.CreateAsync(dto);
+        return Ok(id);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBook(int id)
     {
-        await _bookService.DeleteAsync(id);
+        if(!await _bookService.DeleteAsync(id))
+        {
+            return NotFound();
+        }
         return Ok();
     }
 
-    [HttpPost("filter")]
-    public async Task<IActionResult> FilterBooks([FromBody] BookFilterDto filter)
+    [HttpGet("filter")]
+    public async Task<ActionResult<List<BookResponseDto>>> FilterBooks([FromQuery] BookFilterDto filter)
     {
         var result = await _bookService.GetFilteredAsync(filter);
         return Ok(result);

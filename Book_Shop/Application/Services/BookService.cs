@@ -18,7 +18,7 @@ public class BookService : IBookService
 
     public async Task<Book> GetByIdAsync(int id) => await _repo.GetByIdAsync(id);
 
-    public async Task CreateAsync(BookDto dto)
+    public async Task<int> CreateAsync(BookDto dto)
     {
         var book = new Book
         {
@@ -30,9 +30,11 @@ public class BookService : IBookService
 
         await _repo.AddAsync(book);
         await _repo.SaveAsync();
+
+        return book.Id;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
         var book = await _repo.GetByIdAsync(id);
         
@@ -40,7 +42,10 @@ public class BookService : IBookService
         {
             await _repo.DeleteAsync(book);
             await _repo.SaveAsync();
+            return true;
         }
+
+        return false;
     }
 
     public async Task<IEnumerable<Book>> GetFilteredAsync(BookFilterDto filter)
@@ -48,13 +53,19 @@ public class BookService : IBookService
         var query = (await _repo.GetAllAsync()).AsQueryable();
 
         if (filter.Id.HasValue)
+        {
             query = query.Where(b => b.Id == filter.Id.Value);
+        }
 
         if (filter.Date.HasValue)
+        {
             query = query.Where(b => b.Date.Date == filter.Date.Value.Date);
+        }
 
         if (!string.IsNullOrEmpty(filter.Author))
+        {
             query = query.Where(b => b.Author != null && b.Author.Contains(filter.Author));
+        }
 
         return query.ToList();
     }
